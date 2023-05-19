@@ -14,7 +14,7 @@ from datetime import timedelta
 
 load_dotenv()
 #pip
-app= FastAPI()
+app = FastAPI()
 
 origins=[
     "http://localhost:8000",
