@@ -2,35 +2,25 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
+#include "OneWire.h" 
+#include "DallasTemperature.h"
 #include "env.h"
 
 #define light_pin 2
 #define fan_pin   4
-//#define pir_pin  15
-//#define temp_senor 22
+#define pir_pin  15
+#define temp_senor 22
 
-float randomNum(double min, double max)
-{
-  double range = max - min;
-  double randomValue = ((double)rand() / RAND_MAX) * range + min;
-  return randomValue;
-}
-
-int randomInt(int min, int max)
-{
-  int range = max - min;
-  int randomValue = ((int)rand() / RAND_MAX) * range + min;
-  return randomValue;
-}
+OneWire oneWire(22);
+DallasTemperature tempSensor(&oneWire);
 
 void setup() {
   pinMode(light_pin, OUTPUT);
   pinMode(fan_pin, OUTPUT);
-  //pinMode(pir_pin, INPUT);
-  //pinMode(temp_senor, INPUT);
+  pinMode(pir_pin,INPUT);
 
   Serial.begin(9600);
-  
+  tempSensor.begin();
   // WiFi_SSID and WIFI_PASS should be stored in the env.h
   WiFi.begin(WIFI_SSID, WIFI_PASS);
 
@@ -48,9 +38,23 @@ void setup() {
 //PUT REQUEST
 void set_parameters()
 {
-  float temp_reading= randomNum(20.0,40.0);
-  int presence_reading= randomNum(0,1);
-
+  //Temperature sensor
+  tempSensor.requestTemperaturesByIndex(0);
+  float temp_reading= tempSensor.getTempCByIndex(0);
+  Serial.print(tempSensor.getTempCByIndex(0));
+  
+  //PIR motion sensor
+  int pirState = LOW;  
+  int val=0;
+  bool presence_reading=false;
+  val= digitalRead(pir_pin);
+  if(val==HIGH)
+  {
+    presence_reading= true;
+  }
+  else{
+    presence_reading=false;
+  }
   StaticJsonDocument<32> doc;
   String httpRequestData;
 
