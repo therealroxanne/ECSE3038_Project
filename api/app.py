@@ -17,6 +17,7 @@ load_dotenv()
 app = FastAPI()
 
 origins=[
+    "https://iot-smarthub.onrender.com",
     "http://localhost:8000",
     "https://simple-smart-hub-client.netlify.app"]
 
