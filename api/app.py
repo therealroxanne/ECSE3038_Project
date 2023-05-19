@@ -8,7 +8,7 @@ import pydantic
 from pydantic import BaseModel
 import requests
 from dotenv import load_dotenv
-from datetime import datetime
+from datetime import datetime, datetime, time
 import re
 from datetime import timedelta
 
@@ -96,17 +96,17 @@ async def create_parameter(request:Request):
     duration_time= parameter["light_duration"]
 
     if light=="sunset":
-        global light_preference
         light_preference=getsunset_time()
-    else: light_preference= datetime.strptime(light, "%H:%M:%S").time()
+    else: light_preference= datetime.strptime(light, "%H:%M:%S")
 
-    duration_time= light_preference + (parse_time(duration_time)).strftime("%H:%M:%S")
+    duration_time= light_preference + parse_time(duration_time)
 
     user_data={
         "user_temp": temp,
-        "user_light":str(light_preference.time()),
-        "light_time_off":str(duration_time.time())
+        "user_light": (light_preference.time()),
+        "light_time_off":(duration_time.time())
     }
+
     user_preference= await db["control_system"].insert_one(user_data)
     input_preference= await db["control_system"].find_one({"_id":user_preference.inserted_id})
 
