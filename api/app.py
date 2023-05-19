@@ -114,24 +114,41 @@ async def create_parameter(request:Request):
 @app.get("/output", status_code=201)
 async def get_states():
     state_object= await db["data_input"].find().sort('datetime',-1).to_list(1)
-    
+    light_val= False
     fan_val= False
-    if len(temperatures)==0:
+    if len(state_object)==0:
+        return{
+            "fan": fan_val,
+            "light":light_val
+        }
+    detection=state_object[0].get('presence',[])
+    if len(detection)==0:
+        return{
+            "fan": fan_val,
+            "light":light_val
+        }
+    sensor_temp=state_object[0].get('temperature',[])
+    
+    
+
+    if len(sensor_temp)==0:
         return{
             "fan": fan_val
         }
-    if temperatures[0]>= temp and presence[0]==True:
+    if sensor_temp[0]>= temp and detection[0]==True:
         fan_val= True
     else: fan_val= False
 
-    light_val= False
+    
 
-    if len(datetimes)==0:
+
+    date_time=state_object[0].get('datetime',[])
+    if len(date_time)==0:
         return{
             "light": light_val
         }
 
-    if light_preference>= datetimes[0] and presence[0]==True:
+    if light_preference>= date_time[0] and detection[0]==True:
         light_val=True
     else: light_val==False
 
