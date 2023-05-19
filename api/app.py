@@ -132,7 +132,7 @@ async def get_states():
             "light":light_val
         }
     sensor_temp=state_object[0].get('temperature',[])
-    
+    #read
     
     if len(sensor_temp)==0:
         return{
