@@ -151,7 +151,7 @@ async def get_states():
     if light_preference>= date_time[0] and detection[0]==True:
         light_val=True
     else: light_val==False
-
+ 
     return {
         "light":light_val,
         "fan":fan_val
