@@ -104,8 +104,8 @@ async def create_parameter(request:Request):
 
     user_data={
         "user_temp": temp,
-        "user_light": str(light_preference.time()),
-        "light_time_off":str(duration_time.time())
+        "user_light": light_preference,
+        "light_time_off":duration_time
     }
     user_preference= await db["control_system"].insert_one(user_data)
     input_preference= await db["control_system"].find_one({"_id":user_preference.inserted_id})
