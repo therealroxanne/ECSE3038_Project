@@ -52,8 +52,9 @@ def getsunset_time():
     sunset= data["results"]["sunset"]
     utc_sunset=datetime.strptime(sunset, "%I:%M:%S %p")
     time_string='05:00:00'
-    time_object= datetime.strptime(time_string, '%H:%M:%S')
-    est_sunset_time= utc_sunset - time_object
+    time_object= datetime.strptime(time_string, '%H:%M:%S').time()
+    est_sunset_time= datetime.combine(datetime.min, utc_sunset.time()) + timedelta(hours=time_object.hour, minutes=time_object.minute, seconds=time_object.second)
+    est_sunset_time=(est_sunset_time).time()
     return est_sunset_time
 
 @app.get("/graph")
@@ -95,23 +96,24 @@ async def create_parameter(request:Request):
     global duration_time
     duration_time= parameter["light_duration"]
 
-    if light=="sunset":
+    global light_preference
+    if parameter["user_light"]=="sunset":
         light_preference=getsunset_time()
-    else: light_preference= datetime.strptime(light, "%H:%M:%S")
+    else: light_preference= datetime.strptime(light, "%H:%M:%S").time()
 
-    duration_time= light_preference + parse_time(duration_time)
-
+    duration_timedelta = parse_time(duration_time)
+    end_time = datetime.combine(datetime.today(), light_preference) + duration_timedelta
+    duration_time = end_time.time()
     user_data={
         "user_temp": temp,
-        "user_light": (light_preference.time()),
-        "light_time_off":(duration_time.time())
+        "user_light": str(light_preference),
+        "light_time_off":str(duration_time)
     }
-
     user_preference= await db["control_system"].insert_one(user_data)
     input_preference= await db["control_system"].find_one({"_id":user_preference.inserted_id})
 
-    return input_preference 
-
+    return input_preference
+    
 @app.get("/output", status_code=201)
 async def get_states():
     state_object= await db["data_input"].find().sort('datetime',-1).to_list(1)
@@ -131,7 +133,6 @@ async def get_states():
     sensor_temp=state_object[0].get('temperature',[])
     
     
-
     if len(sensor_temp)==0:
         return{
             "fan": fan_val
