@@ -100,7 +100,7 @@ async def create_parameter(request:Request):
         light_preference=getsunset_time()
     else: light_preference= datetime.strptime(light, "%H:%M:%S").time()
 
-    duration_time= light_preference+ parse_time(duration_time)
+    duration_time= light_preference + (parse_time(duration_time)).strftime("%H:%M:%S")
 
     user_data={
         "user_temp": temp,
