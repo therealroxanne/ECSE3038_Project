@@ -98,7 +98,7 @@ async def create_parameter(request:Request):
     if light=="sunset":
         global light_preference
         light_preference=getsunset_time()
-    else: light_preference= datetime.strptime(light, "%H:%M:%S")
+    else: light_preference= datetime.strptime(light, "%H:%M:%S").time()
 
     duration_time= light_preference+ parse_time(duration_time)
 
