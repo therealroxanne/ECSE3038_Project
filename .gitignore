@@ -1,0 +1,5 @@
+embedded/env.henv.h
+embedded/.vscode
+api/.env
+api/venv
+api/__pycache__
