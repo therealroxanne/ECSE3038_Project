@@ -109,7 +109,7 @@ async def create_parameter(request:Request):
 
     return input_preference
     
-@app.get("/output", status_code=201)
+@app.get("/api", status_code=201)
 async def get_states():
     state_object= await db["sensor_input"].find().sort('datetime',-1).to_list(1)
     if len(state_object)==0:
@@ -121,7 +121,7 @@ async def get_states():
 
     return state_object
 
-@app.post("/update",status_code=201)
+@app.post("/api",status_code=201)
 async def update_state(request:Request):
     update_obj= await request.json()
    
