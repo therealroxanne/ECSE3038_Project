@@ -21,7 +21,6 @@ void setup() {
 
   Serial.begin(9600);
   tempSensor.begin();
-  // WiFi_SSID and WIFI_PASS should be stored in the env.h
   WiFi.begin(WIFI_SSID, WIFI_PASS);
 
   // Connect to wifi
@@ -41,8 +40,9 @@ void set_parameters()
   //Temperature sensor
   tempSensor.requestTemperaturesByIndex(0);
   float temp_reading= tempSensor.getTempCByIndex(0);
+  Serial.print("temperature:");
   Serial.print(tempSensor.getTempCByIndex(0));
-  
+
   //PIR motion sensor
   int pirState = LOW;  
   int val=0;
@@ -55,7 +55,10 @@ void set_parameters()
   else{
     presence_reading=false;
   }
-  StaticJsonDocument<32> doc;
+  Serial.print("Presence:");
+  Serial.print(presence_reading);
+  
+  StaticJsonDocument<96> doc;
   String httpRequestData;
 
   doc["temperature"] = temp_reading;
@@ -74,7 +77,7 @@ void set_parameters()
   if(status_code<0){
     Serial.print("Error occurred");
   }
-  if (status_code==204)
+  if (status_code==201)
   {
     Serial.print("Successful");
   }
@@ -106,20 +109,22 @@ void get_state(){
       Serial.println(httpResponseCode);
     }
     
-    String response_body= http.getString();
-    StaticJsonDocument<128> doc;
+    http_response= http.getString();
+
+    StaticJsonDocument<192> doc;
 
     DeserializationError error = deserializeJson(doc, http_response);
 
     if (error) {
-     Serial.print("deserializeJson() failed: ");
-     Serial.println(error.c_str());
-     return;
-}
+      Serial.print("deserializeJson() failed: ");
+      Serial.println(error.c_str());
+    return;
+    }
 
-const char* id = doc["_id"]; // "640e1fc87a0bf6493917690b"
-bool fan = doc["fan"]; // "True"
-bool light = doc["light"]; // "False"
+    const char* id = doc["_id"]; // "646995b6e9adbf9f95b64330"
+    bool fan = doc["fan"]; // true
+    bool light = doc["light"]; // false
+    const char* current_time = doc["current_time"]; // "2023-05-20T21:46:42.941692"
 
 if (fan==false)
 {

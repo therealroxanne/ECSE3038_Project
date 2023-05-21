@@ -63,11 +63,8 @@ async def get_parameter(request: Request):
     n = int(request.query_params.get('size', 10))
     sensor_input= await db["data_input"].find().to_list(n)
 
-    global presence
     presence= [param["presence"] for param in sensor_input]
-    global temperatures
     temperatures=[param["temperature"] for param in sensor_input]
-    global datetimes
     datetimes= [param["datetime"] for param in sensor_input]
 
     output=[]
@@ -90,14 +87,11 @@ async def get_parameter(request: Request):
 @app.put("/settings", status_code=201)
 async def create_parameter(request:Request):
     parameter= await request.json()
-    global temp
+
     temp= parameter["user_temp"]
-    global light
     light= parameter["user_light"]
-    global duration_time
     duration_time= parameter["light_duration"]
 
-    global light_preference
     if parameter["user_light"]=="sunset":
         light_preference=getsunset_time()
     else: light_preference= datetime.strptime(light, "%H:%M:%S").time()
@@ -118,42 +112,58 @@ async def create_parameter(request:Request):
 @app.get("/output", status_code=201)
 async def get_states():
     state_object= await db["data_input"].find().sort('datetime',-1).to_list(1)
-    light_val= False
-    fan_val= False
     if len(state_object)==0:
         return{
-            "fan": fan_val,
-            "light":light_val
-        }
-    detection=state_object[0].get('presence',[])
-    if len(detection)==0:
-        return{
-            "fan": fan_val,
-            "light":light_val
-        }
-    sensor_temp=state_object[0].get('temperature',[])
-    #read
-    
-    if len(sensor_temp)==0:
-        return{
-            "fan": fan_val
-        }
-    if sensor_temp[0]>= temp and detection[0]==True:
-        fan_val= True
-    else: fan_val= False
-
-
-    date_time=state_object[0].get('datetime',[])
-    if len(date_time)==0:
-        return{
-            "light": light_val
+            "temperature": 0.0,
+            "presence": False,
+            "datetime":datetime.now()
         }
 
-    if light_preference>= date_time[0] and detection[0]==True:
-        light_val=True
-    else: light_val==False
- 
-    return {
-        "light":light_val,
-        "fan":fan_val
+    return state_object
+
+@app.put("/update")
+async def update_state(request:Request):
+    update_obj= await request.json()
+   
+    sensor_temp= update_obj.get("temperature")
+    detection= update_obj.get("presence")
+    date_time= update_obj.get("datetime")
+
+    update_obj["current_time"]= datetime.now()
+
+    user_data= await db["control_system"].find_one()
+    user_temp= user_data["user_temp"]
+    user_light= user_data["user_light"]
+    duration_time= user_data["light_time_off"]
+
+    if len(user_data)==0:
+        return{
+            update_obj["fan"]: False,
+            update_obj["light"]:False,
+            update_obj["current_time"]:datetime.now()
     }
+
+    if len(update_obj)==0:
+        return{
+            update_obj["fan"]: False,
+            update_obj["light"]:False,
+            update_obj["current_time"]:datetime.now()
+        }
+    if sensor_temp is not None and user_temp is not None and isinstance(sensor_temp, int) and isinstance(user_temp, int):
+        if sensor_temp>= user_temp and detection==True:
+             update_obj["fan"]= True
+        else: update_obj["fan"]= False
+    else:
+        update_obj["fan"] = False 
+
+    if user_light is not None and date_time is not None and isinstance(user_light, datetime.time) and isinstance(date_time, datetime.time):
+        if user_light <= date_time < duration_time and detection == True:
+            update_obj["light"] = True
+        else:
+            update_obj["light"] = False
+    else:
+        update_obj["light"] = False 
+ 
+    updated_data= await db["data_input"].insert_one(update_obj)
+    send_data=await db["data_input"].find_one({"id":updated_data.inserted_id})
+    return send_data
