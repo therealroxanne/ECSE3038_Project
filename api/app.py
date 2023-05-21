@@ -61,7 +61,7 @@ def getsunset_time():
 @app.get("/graph")
 async def get_parameter(request: Request):
     n = int(request.query_params.get('size', 10))
-    sensor_input= await db["data_input"].find().to_list(n)
+    sensor_input= await db["sensor_input"].find().to_list(n)
 
     presence= [param["presence"] for param in sensor_input]
     temperatures=[param["temperature"] for param in sensor_input]
@@ -111,7 +111,7 @@ async def create_parameter(request:Request):
     
 @app.get("/output", status_code=201)
 async def get_states():
-    state_object= await db["data_input"].find().sort('datetime',-1).to_list(1)
+    state_object= await db["sensor_input"].find().sort('datetime',-1).to_list(1)
     if len(state_object)==0:
         return{
             "temperature": 0.0,
