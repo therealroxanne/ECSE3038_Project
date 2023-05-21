@@ -121,7 +121,7 @@ async def get_states():
 
     return state_object
 
-@app.put("/update")
+@app.post("/update",status_code=201)
 async def update_state(request:Request):
     update_obj= await request.json()
    
