@@ -21,7 +21,7 @@ void setup() {
 
   Serial.begin(9600);
   sensors.begin();
-  WiFi.begin("Wokwi-GUEST", "");
+  WiFi.begin("WIFI_SSID", "WIFI_PASS");
 
   // Connect to wifi
   Serial.println("Connecting");
