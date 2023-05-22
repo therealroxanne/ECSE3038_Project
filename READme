@@ -1,2 +1,28 @@
 url: https://iot-smarthub.onrender.com
 
+Internet of Things, or IoT, is the term used to describe a network of actual physical things or "things" that are linked to the internet and may 
+communicate with one another to carry out specific functions.
+
+A software system known as an IoT platform makes it possible to manage, install, and integrate IoT devices and data. It offers the required tools
+for gathering and analyzing data produced by these devices, and it enables users to operate and monitor their IoT devices from a single location.
+
+The objective of this project is to create an IoT platform that manages basic appliances that are traditionally managed by the flick of a switch, 
+such as fans and air conditioners, as well as lighting appliances like lights and in-wall lighting fixtures.
+
+1. Users should be able to designate a time after which the lights should turn on using an IoT platform capability. In that case, the IoT platform 
+can only turn on the lights if the current time is later than the user-specified time.
+2. Users should be able to define a temperature at which the fan should activate using the IoT platform's capability. A temperature sensor, such as 
+a digital temperature sensor, coupled to the ESP32 and able to read the current temperature of the room, can be used to achieve this. If the current 
+temperature is higher than the user-specified value, the IoT platform can then only turn on the fan in that case.
+3.A sensor that can determine whether a person is present in the space should also be part of the IoT platform. For example, a passive infrared (PIR)
+sensor that detects changes in infrared radiation that happen when a human walks within its field of vision can be used to achieve this. This data can 
+then be used by the IoT platform to decide whether to turn on the lights.
+
+COMBINED LOGIC
+The controlled appliances should only switch on if each of the required conditions is satisfied using a combination of the temperature-based control, 
+time-base control, and presence detection features of the IoT platform. 
+
+Using logical programming that verifies the following, this can be achieved:
+
+Consider both the data from the presence sensor and the current temperature before choosing whether to turn on the fan.
+Consider the presence sensor data as well as the current time before choosing whether to turn on the lights.
