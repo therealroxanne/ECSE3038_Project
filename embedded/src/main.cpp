@@ -4,7 +4,7 @@
 #include <ArduinoJson.h>
 #include "OneWire.h" 
 #include "DallasTemperature.h"
-//#include "env.h"
+#include "env.h"
 
 #define light_pin 2
 #define fan_pin   4
@@ -13,8 +13,6 @@
 
 OneWire oneWire(22);
 DallasTemperature sensors(&oneWire);
-const char * ENDPOINT1= "https://iot-smarthub.onrender.com/output";
-const char * ENDPOINT2= "https://iot-smarthub.onrender.com/update";
 
 void setup() {
   pinMode(light_pin, OUTPUT);
