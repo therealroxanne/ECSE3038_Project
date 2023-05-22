@@ -4,7 +4,7 @@
 #include <ArduinoJson.h>
 #include "OneWire.h" 
 #include "DallasTemperature.h"
-#include "env.h"
+//#include "env.h"
 
 #define light_pin 2
 #define fan_pin   4
@@ -12,7 +12,9 @@
 #define temp_senor 22
 
 OneWire oneWire(22);
-DallasTemperature tempSensor(&oneWire);
+DallasTemperature sensors(&oneWire);
+const char * ENDPOINT1= "https://iot-smarthub.onrender.com/output";
+const char * ENDPOINT2= "https://iot-smarthub.onrender.com/update";
 
 void setup() {
   pinMode(light_pin, OUTPUT);
@@ -20,7 +22,7 @@ void setup() {
   pinMode(pir_pin,INPUT);
 
   Serial.begin(9600);
-  tempSensor.begin();
+  sensors.begin();
   WiFi.begin("Wokwi-GUEST", "");
 
   // Connect to wifi
@@ -38,10 +40,10 @@ void setup() {
 void set_parameters()
 {
   //Temperature sensor
-  tempSensor.requestTemperaturesByIndex(0);
-  float temp_reading= tempSensor.getTempCByIndex(0);
+  sensors.requestTemperatures();
+  float temp_reading= sensors.getTempCByIndex(0);
   Serial.print("temperature:");
-  Serial.print(tempSensor.getTempCByIndex(0));
+  Serial.print(temp_reading);
   
 
   //PIR motion sensor
