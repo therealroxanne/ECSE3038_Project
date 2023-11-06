@@ -95,7 +95,7 @@ void get_state(){
    String http_response;
   http.begin(ENDPOINT2);
 
-  int httpResponseCode= http.GET(); //if a negative number is return then a connection to the servo was not established 
+  int httpResponseCode= http.GET(); //if a negative number is return then a connection to the server was not established 
   
     if(httpResponseCode>0)
     {
